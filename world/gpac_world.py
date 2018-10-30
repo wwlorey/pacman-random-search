@@ -5,7 +5,7 @@ import world.coordinate as coord_class
 
 
 class Direction(Enum):
-    NONE  = 0  # pacman only
+    NONE  = 0  # applicable to pacman only
     UP    = 1
     DOWN  = 2
     LEFT  = 3
@@ -73,7 +73,6 @@ class GPacWorld:
                 to every other non-wall cell. Returns False otherwise.
                 """
                 
-                # TODO: This method is scary slow for large worlds. Use BFS instead?
                 def find_path_recursive(coord):
                     """Recursively attempts to 'travel' to all non-wall coordinates (denoted 
                     by wall_coords) and returns True if possible, False otherwise.

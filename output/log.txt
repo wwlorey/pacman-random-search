@@ -1,5 +1,3 @@
-[DEFAULT]
-
 ###################################
 # GP Parameters
 ###################################
@@ -36,3 +34,70 @@ log file path = output/log.txt
 highest score file path = output/highest_score_game_sequence_all_time_step.txt
 soln file path = output/soln.txt
 
+
+###################################
+# Seed Value
+###################################
+seed = 1540935946.9096627
+
+Result Log
+
+Run 1
+
+Run 2
+
+Run 3
+
+Run 4
+
+Run 5
+
+Run 6
+
+Run 7
+
+Run 8
+
+Run 9
+
+Run 10
+
+Run 11
+
+Run 12
+
+Run 13
+
+Run 14
+
+Run 15
+
+Run 16
+
+Run 17
+
+Run 18
+
+Run 19
+
+Run 20
+
+Run 21
+
+Run 22
+
+Run 23
+
+Run 24
+
+Run 25
+
+Run 26
+
+Run 27
+
+Run 28
+
+Run 29
+
+Run 30

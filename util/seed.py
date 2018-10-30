@@ -9,7 +9,7 @@ class Seed:
         """
         self.config = config
 
-        if int(self.config.settings['use_external_seed']):
+        if self.config.settings.getboolean('use external seed'):
             self.val = float(self.config.settings['seed'])
         
         else:

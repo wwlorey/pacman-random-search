@@ -17,7 +17,7 @@ class Log:
 
         self.config = config
 
-        self.file = open(self.config.settings['log_file_path'], 'w' if overwrite else 'a')
+        self.file = open(self.config.settings['log file path'], 'w' if overwrite else 'a')
 
         self.seed = seed
 
