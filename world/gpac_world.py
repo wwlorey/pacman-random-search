@@ -47,7 +47,7 @@ class GPacWorld:
         self.prev_ghost_coords = copy.deepcopy(self.ghost_coords)
         self.wall_coords = set([])
         self.pill_coords = set([])
-        self.fruit_coords = set([])
+        self.fruit_coord = set([])
         self.time_remaining = self.time_multiplier * self.width * self.height
         self.total_time = self.time_remaining
         self.num_pills_consumed = 0
@@ -281,7 +281,7 @@ class GPacWorld:
         for c in self.pill_coords:
             world[c.x][c.y] = GPacChars.PILL
 
-        for c in self.fruit_coords:
+        for c in self.fruit_coord:
             world[c.x][c.y] = GPacChars.FRUIT
 
         # Flip each row in the world matrix for correct printing 
@@ -327,3 +327,24 @@ class GPacWorld:
             # No more pills in the world
             self.score += self.time_remaining // self.total_time
         
+
+    def randomly_spawn_fruit(self):
+        """Probabilistically spawns a fruit in the world.
+
+        Note that if a fruit already exists, another cannot be spawned.
+
+        A fruit can only spawn in cell that is not occupied by pacman, not
+        occupied by a wall, and not occupied by a pill.
+        """
+        if len(self.fruit_coord):
+            # A fruit already exists
+            return
+
+        if random.random() <= self.fruit_spawn_prob:
+            possible_coords = copy.deepcopy(list(self.all_coords.difference(set([self.pacman_coord])).difference(self.wall_coords).difference(self.pill_coords)))
+            random.shuffle(possible_coords)
+
+            for possible_fruit_coord in possible_coords:
+                self.fruit_coord.add(possible_fruit_coord)
+                break
+

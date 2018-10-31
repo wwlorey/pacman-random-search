@@ -21,7 +21,7 @@ class GPDriver:
 
         self.log = log_class.Log(self.config, self.seed, overwrite=True)
 
-        self.global_best_score = 0
+        self.global_best_score = -1
 
 
     def init_run_variables(self):
@@ -30,7 +30,7 @@ class GPDriver:
         This function should be called before each run.
         """
         self.eval_count = 0
-        self.local_best_score = 0
+        self.local_best_score = -1
         self.gpac_world = gpac_world_class.GPacWorld(self.config)
 
 
@@ -38,7 +38,11 @@ class GPDriver:
         """Moves all units in self.gpac_world in a random direction.
         
         This function implements the random controllers for each unit.
+
+        Before units are moved, a fruit probabilistically spawns.
         """
+        self.gpac_world.randomly_spawn_fruit()
+
         self.gpac_world.move_pacman()
 
         for ghost_id in range(len(self.gpac_world.ghost_coords)):
@@ -56,8 +60,8 @@ class GPDriver:
             self.gpac_world.num_pills_consumed += 1
 
         # Update fruit
-        if self.gpac_world.pacman_coord in self.gpac_world.fruit_coords:
-            self.gpac_world.fruit_coords.remove(self.gpac_world.pacman_coord)
+        if self.gpac_world.pacman_coord in self.gpac_world.fruit_coord:
+            self.gpac_world.fruit_coord.remove(self.gpac_world.pacman_coord)
             self.gpac_world.num_fruit_consumed += 1
 
         # Update score
@@ -65,7 +69,7 @@ class GPDriver:
 
         # Write to world file
         self.gpac_world.world_file.save_snapshot(self.gpac_world.pacman_coord,
-            self.gpac_world.ghost_coords, self.gpac_world.fruit_coords, 
+            self.gpac_world.ghost_coords, self.gpac_world.fruit_coord, 
             self.gpac_world.time_remaining, self.gpac_world.score)
 
         # Increment evaluation count

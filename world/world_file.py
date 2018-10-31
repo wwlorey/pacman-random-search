@@ -1,3 +1,6 @@
+import world.coordinate as coord_class
+
+
 class WorldFile:
     def __init__(self, config):
         """Initializes the WorldFile class.
@@ -6,6 +9,7 @@ class WorldFile:
         """
         self.config = config
         self.file_str = ''
+        self.prev_seen_fruit = coord_class.Coordinate(-1, -1)
 
 
     def save_first_snapshot(self, width, height, pacman, walls, ghosts, pills, remaining_time):
@@ -35,19 +39,22 @@ class WorldFile:
             self.save_triplet(ghost_id + 1, ghosts[ghost_id].x, ghosts[ghost_id].y)
 
         for c in fruit:
-            self.save_triplet('f', c.x, c.y)
+            # A fruit coordinate should only be written once
+            if self.prev_seen_fruit != c:
+                self.prev_seen_fruit = c
+                self.save_triplet('f', c.x, c.y)
 
         self.save_triplet('t', remaining_time, score)
 
 
     def save_line(self, data):
-        """Writes a single line (including newline char) to self.file."""
+        """Saves a single line (including newline char) to the world file string."""
         self.file_str += str(data) + '\n'
 
     
     def save_triplet(self, data1, data2, data3):
-        """Writes a space delimited, single line (including newline char) 
-        containing the given triplet to self.file."""
+        """Saves a space delimited, single line (including newline char) 
+        containing the given triplet to the world file string."""
         self.file_str += str(data1) + ' ' + str(data2) + ' ' + str(data3) + '\n'
 
 
@@ -55,4 +62,5 @@ class WorldFile:
         """Writes self.file_str to the world file."""
         file = open(self.config.settings['world file path'], 'w')
         file.write(self.file_str)
+        file.close()
 
