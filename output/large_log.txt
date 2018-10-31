@@ -7,10 +7,10 @@ num fitness evals = 2000
 ###################################
 # World Generation Parameters
 ###################################
-width = 15
-height = 15
-pill density = 0.2
-wall density = 0.4
+width = 80
+height = 80
+pill density = 30
+wall density = 30
 num ghosts = 3
 
 use external seed = False
@@ -19,75 +19,22 @@ default seed = 123456789
 ###################################
 # Score 
 ###################################
-fruit spawn prob = 0.02
-fruit score = 2
+fruit spawn prob = 0.05
+fruit score = 10
 
 ###################################
 # Timing
 ###################################
-time multiplier = 5
+time multiplier = 2
 
 ###################################
 # Output Files
 ###################################
-log file path = output/log.txt
-world file path = output/highest_score_game_sequence_all_time_step_world_file.txt
-soln file path = output/soln.txt
-
+log file path = output/large_log.txt
+world file path = output/highest_score_game_sequence_all_time_step_world_file_large.txt
 ###################################
 # Seed Value
 ###################################
-seed = 1541018602.7020614
+seed = 1541018498.3273098
 
 Result Log
-
-Run 1
-1	0
-66	3
-125	7
-202	11
-222	15
-224	19
-384	23
-448	26
-449	30
-603	34
-624	38
-2183	41
-2186	45
-2243	48
-2344	51
-2500	54
-
-Run 2
-1	0
-10	3
-88	6
-89	10
-515	13
-576	17
-580	20
-594	24
-611	27
-1007	31
-1009	34
-1012	37
-1033	41
-
-Run 3
-1	0
-61	3
-69	6
-73	9
-76	12
-130	15
-131	18
-139	21
-380	23
-582	27
-652	30
-654	33
-2175	37
-2181	40
-2259	44
-2310	48
