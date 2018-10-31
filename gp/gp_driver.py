@@ -78,14 +78,12 @@ class GPDriver:
         if self.gpac_world.pacman_coord in self.gpac_world.fruit_coords:
             self.gpac_world.fruit_coords.remove(self.gpac_world.pacman_coord)
             self.gpac_world.num_fruit_consumed += 1
+
+        # Update score
+        self.gpac_world.update_score()
+
+        # Write to world file
+        self.gpac_world.world_file.write_snapshot(self.gpac_world.pacman_coord,
+            self.gpac_world.ghost_coords, self.gpac_world.fruit_coords, 
+            self.gpac_world.time_remaining, self.gpac_world.score)
     
-
-    def determine_score(self):
-        """Determines the score associated with this run."""
-        score = (self.gpac_world.num_pills_consumed // (self.gpac_world.num_pills_consumed + len(self.gpac_world.pill_coords))) + (self.gpac_world.num_fruit_consumed * self.gpac_world.fruit_score)
-
-        if not len(self.gpac_world.pill_coords):
-            # No more pills in the world
-            score += self.gpac_world.time_remaining // self.gpac_world.total_time
-        
-        print(score)

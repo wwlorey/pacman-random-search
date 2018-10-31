@@ -43,8 +43,7 @@ if __name__ == '__main__':
 
             gp_driver.gpac_world.visualize()
 
-        gp_driver.determine_score()
-
+        input()
         gp_driver.init_run_variables()
         gp_driver.increment_run_count()
 

@@ -2,6 +2,7 @@ from enum import Enum
 import copy
 import random
 import world.coordinate as coord_class
+import world.world_file as world_file_class
 
 
 class Direction(Enum):
@@ -51,6 +52,7 @@ class GPacWorld:
         self.total_time = self.time_remaining
         self.num_pills_consumed = 0
         self.num_fruit_consumed = 0
+        self.score = 0
         
         # Create helper set of all coordinates
         self.all_coords = set([])
@@ -61,6 +63,11 @@ class GPacWorld:
 
         # Place walls and pills in the world
         self.generate_world()
+
+        # Create & write to world file
+        self.world_file = world_file_class.WorldFile(self.config)
+        self.world_file.write_first_snapshot(self.width, self.height, self.pacman_coord,
+            self.wall_coords, self.ghost_coords, self.pill_coords, self.time_remaining)
 
 
     def generate_world(self):
@@ -312,3 +319,11 @@ class GPacWorld:
         
         return adj_coords
 
+
+    def update_score(self):
+        self.score = int((self.num_pills_consumed / (self.num_pills_consumed + len(self.pill_coords))) * 100) + (self.num_fruit_consumed * self.fruit_score)
+
+        if not len(self.pill_coords):
+            # No more pills in the world
+            self.score += self.time_remaining // self.total_time
+        
