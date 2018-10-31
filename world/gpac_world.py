@@ -1,8 +1,8 @@
 from enum import Enum
 import copy
+import gp.world_file as world_file_class
 import random
 import world.coordinate as coord_class
-import world.world_file as world_file_class
 
 
 class Direction(Enum):
