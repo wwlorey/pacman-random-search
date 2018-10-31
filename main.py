@@ -4,7 +4,6 @@ import gp.gp_driver as gp_driver_class
 import util.args as args_class
 import util.config as config_class
 
-
 if __name__ == '__main__':
 
     # Process command line arguments
@@ -31,7 +30,6 @@ if __name__ == '__main__':
 
             gp_driver.update_world_state()
             
-
         gp_driver.check_update_world_file()
 
         gp_driver.init_run_variables()
