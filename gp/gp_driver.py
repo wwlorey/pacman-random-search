@@ -67,14 +67,13 @@ class GPDriver:
         # Update score
         self.gpac_world.update_score()
 
-        # Write to world file
+        # Update the world state
         self.gpac_world.world_file.save_snapshot(self.gpac_world.pacman_coord,
             self.gpac_world.ghost_coords, self.gpac_world.fruit_coord, 
             self.gpac_world.time_remaining, self.gpac_world.score)
 
         # Increment evaluation count
         self.eval_count += 1
-
         
         # Determine if a new local best score (fitness) has been found
         if self.gpac_world.score > self.local_best_score:
