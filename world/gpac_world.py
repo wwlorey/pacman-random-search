@@ -5,11 +5,20 @@ import world.coordinate as coord_class
 
 
 class Direction(Enum):
-    NONE  = 0  # applicable to pacman only
+    NONE  = 0  # Applicable to pacman only
     UP    = 1
     DOWN  = 2
     LEFT  = 3
     RIGHT = 4
+    RAND  = 5  # A random direction should be chosen
+
+
+# Define movement possibilities using Direction class
+POSSIBLE_PACMAN_MOVES = [Direction.NONE, Direction.UP, Direction.DOWN,
+    Direction.LEFT, Direction.RIGHT]
+
+POSSIBLE_GHOST_MOVES = [Direction.UP, Direction.DOWN, Direction.LEFT,
+    Direction.RIGHT]
 
 
 class GPacWorld:
@@ -39,6 +48,9 @@ class GPacWorld:
         self.pill_coords = set([])
         self.fruit_coords = set([])
         self.time_remaining = self.time_multiplier * self.width * self.height
+        self.total_time = self.time_remaining
+        self.num_pills_consumed = 0
+        self.num_fruit_consumed = 0
         
         # Create helper set of all coordinates
         self.all_coords = set([])
@@ -74,8 +86,9 @@ class GPacWorld:
                 """
                 
                 def find_path_recursive(coord):
-                    """Recursively attempts to 'travel' to all non-wall coordinates (denoted 
-                    by wall_coords) and returns True if possible, False otherwise.
+                    """Recursively attempts to 'travel' to all non-wall coordinates 
+                    (denoted by wall_coords) and returns True if possible, 
+                    False otherwise.
                     """
                     coords_to_find.remove(coord)
 
@@ -131,11 +144,15 @@ class GPacWorld:
                 self.pill_coords.add(c)
 
 
-    def move_pacman(self, direction=Direction.NONE):
+    def move_pacman(self, direction=Direction.RAND):
         """Attempts to move pacman in the given direction.
 
         Returns True if the move is successful, False otherwise.
         """
+        if direction == Direction.RAND:
+            # Choose a random direction
+            direction = random.choice(POSSIBLE_PACMAN_MOVES)
+
         if direction == Direction.NONE:
             # No action needed
             return True
@@ -163,15 +180,19 @@ class GPacWorld:
         return False
 
 
-    def move_ghost(self, ghost_id, direction=Direction.UP):
+    def move_ghost(self, ghost_id, direction=Direction.RAND):
         """Attempts to move ghost with ghost_id (index for self.ghost_coords) 
         in the given direction.
 
         Returns True if the move is successful, False otherwise.
         """
-        if ghost_id >= len(ghost_coords):
+        if ghost_id >= len(self.ghost_coords):
             # This ghost does not exist
             return False
+
+        if direction == Direction.RAND:
+            # Choose a random direction
+            direction = random.choice(POSSIBLE_GHOST_MOVES)
 
         new_coord = copy.deepcopy(self.ghost_coords[ghost_id])
         
@@ -226,8 +247,7 @@ class GPacWorld:
 
         A movable coordinate is one that does not contain a wall and that is in the world.
         """
-        return not coord in self.wall_coords and coord.x >= 0 and coord.y >= 0 \
-            and coord.x < self.width and coord.y < self.height
+        return not coord in self.wall_coords and coord.x >= 0 and coord.y >= 0 and coord.x < self.width and coord.y < self.height
 
 
     def visualize(self):

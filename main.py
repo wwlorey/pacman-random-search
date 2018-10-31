@@ -34,8 +34,16 @@ if __name__ == '__main__':
         gp_driver.log.write_run_header(gp_driver.run_count)
 
         while gp_driver.decide_termination():
-            # TODO: Run the GP
-            gp_driver.eval_count += 1
+            # Execute a turn
+            gp_driver.move_units()
+
+            gp_driver.update_world_state()
+            
+            gp_driver.eval_count += 1 # TODO: is this correct?
+
+            gp_driver.gpac_world.visualize()
+
+        gp_driver.determine_score()
 
         gp_driver.init_run_variables()
         gp_driver.increment_run_count()
