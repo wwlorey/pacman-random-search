@@ -5,48 +5,54 @@ class WorldFile:
         Where config is a Config object.
         """
         self.config = config
-        self.file = open(self.config.settings['world file path'], 'w')
+        self.file_str = ''
 
 
-    def write_first_snapshot(self, width, height, pacman, walls, ghosts, pills, remaining_time):
-        """Writes the initial snapshot to the world file."""
-        self.write_line(width)
-        self.write_line(height)
+    def save_first_snapshot(self, width, height, pacman, walls, ghosts, pills, remaining_time):
+        """Saves the initial snapshot to the world file string."""
+        self.save_line(width)
+        self.save_line(height)
 
-        self.write_triplet('m', pacman.x, pacman.y)
+        self.save_triplet('m', pacman.x, pacman.y)
 
         for c in walls:
-            self.write_triplet('w', c.x, c.y)
+            self.save_triplet('w', c.x, c.y)
 
         for ghost_id in range(len(ghosts)):
-            self.write_triplet(ghost_id + 1, ghosts[ghost_id].x, ghosts[ghost_id].y)
+            self.save_triplet(ghost_id + 1, ghosts[ghost_id].x, ghosts[ghost_id].y)
 
         for c in pills:
-            self.write_triplet('p', c.x, c.y)
+            self.save_triplet('p', c.x, c.y)
 
-        self.write_triplet('t', remaining_time, 0)
+        self.save_triplet('t', remaining_time, 0)
 
         
-    def write_snapshot(self, pacman, ghosts, fruit, remaining_time, score):
-        """Writes a non-initial snapshot to the world file."""
-        self.write_triplet('m', pacman.x, pacman.y)     
+    def save_snapshot(self, pacman, ghosts, fruit, remaining_time, score):
+        """Saves a non-initial snapshot to the world file string."""
+        self.save_triplet('m', pacman.x, pacman.y)     
 
         for ghost_id in range(len(ghosts)):
-            self.write_triplet(ghost_id + 1, ghosts[ghost_id].x, ghosts[ghost_id].y)
+            self.save_triplet(ghost_id + 1, ghosts[ghost_id].x, ghosts[ghost_id].y)
 
         for c in fruit:
-            self.write_triplet('f', c.x, c.y)
+            self.save_triplet('f', c.x, c.y)
 
-        self.write_triplet('t', remaining_time, score)
+        self.save_triplet('t', remaining_time, score)
 
 
-    def write_line(self, data):
+    def save_line(self, data):
         """Writes a single line (including newline char) to self.file."""
-        self.file.write(str(data) + '\n')
+        self.file_str += str(data) + '\n'
 
     
-    def write_triplet(self, data1, data2, data3):
+    def save_triplet(self, data1, data2, data3):
         """Writes a space delimited, single line (including newline char) 
         containing the given triplet to self.file."""
-        self.file.write(str(data1) + ' ' + str(data2) + ' ' + str(data3) + '\n')
+        self.file_str += str(data1) + ' ' + str(data2) + ' ' + str(data3) + '\n'
+
+
+    def write_to_file(self):
+        """Writes self.file_str to the world file."""
+        file = open(self.config.settings['world file path'], 'w')
+        file.write(self.file_str)
 

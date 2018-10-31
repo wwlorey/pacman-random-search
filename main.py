@@ -16,14 +16,6 @@ if __name__ == '__main__':
     config = config_class.Config(config_file)
 
 
-    # Testing
-    import world.gpac_world as world_class
-
-    world = world_class.GPacWorld(config)
-    world.visualize()
-    print(world.check_game_over())
-
-
     # Initialize the GP driver and its run variables
     gp_driver = gp_driver_class.GPDriver(config)
 
@@ -39,11 +31,9 @@ if __name__ == '__main__':
 
             gp_driver.update_world_state()
             
-            gp_driver.eval_count += 1 # TODO: is this correct?
 
-            gp_driver.gpac_world.visualize()
+        gp_driver.check_update_world_file()
 
-        input()
         gp_driver.init_run_variables()
         gp_driver.increment_run_count()
 

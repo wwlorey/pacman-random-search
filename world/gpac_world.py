@@ -66,7 +66,7 @@ class GPacWorld:
 
         # Create & write to world file
         self.world_file = world_file_class.WorldFile(self.config)
-        self.world_file.write_first_snapshot(self.width, self.height, self.pacman_coord,
+        self.world_file.save_first_snapshot(self.width, self.height, self.pacman_coord,
             self.wall_coords, self.ghost_coords, self.pill_coords, self.time_remaining)
 
 
