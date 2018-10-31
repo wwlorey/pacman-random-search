@@ -23,14 +23,20 @@ class GPDriver:
 
         self.global_best_score = -1
 
+        self.init_game()
+
 
     def init_run_variables(self):
         """Initializes run specific variables.
 
         This function should be called before each run.
         """
-        self.eval_count = 0
+        self.eval_count = 1
         self.local_best_score = -1
+
+
+    def init_game(self):
+        """(Re)initializes the GPacWorld class member variable."""
         self.gpac_world = gpac_world_class.GPacWorld(self.config)
 
 
@@ -72,9 +78,6 @@ class GPDriver:
             self.gpac_world.ghost_coords, self.gpac_world.fruit_coord, 
             self.gpac_world.time_remaining, self.gpac_world.score)
 
-        # Increment evaluation count
-        self.eval_count += 1
-        
         # Determine if a new local best score (fitness) has been found
         if self.gpac_world.score > self.local_best_score:
             self.local_best_score = self.gpac_world.score
@@ -95,6 +98,15 @@ class GPDriver:
             # The number of desired evaluations has been reached
             return False
 
+        return True
+
+
+    def check_game_over(self):
+        """Returns False if the game is over (allowing for a loop to terminate), 
+        and True otherwise.
+
+        The conditions for game over are seen in check_game_over() in the GPacWorld class.
+        """
         if self.gpac_world.check_game_over():
             return False
 
@@ -114,4 +126,9 @@ class GPDriver:
     def increment_run_count(self):
         """Increments the run count by one."""
         self.run_count += 1
+
+
+    def increment_eval_count(self):
+        """Increments the evaluation count by one."""
+        self.eval_count += 1
 
