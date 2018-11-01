@@ -4,6 +4,11 @@ import gp.world_file as world_file_class
 import random
 import world.coordinate as coord_class
 
+import pyximport
+pyximport.install()
+
+import world.find_path as fast_pathfinder
+
 
 class GPacWorld:
     def __init__(self, config, initial_instance=False):
@@ -78,22 +83,11 @@ class GPacWorld:
                 """Returns True if there is a path from pacman's starting cell
                 to every other non-wall cell. Returns False otherwise.
                 """
-                
                 # Construct a set of coordinates to find
                 coords_to_find = self.all_coords.difference(wall_coords)
 
-                neighbors_queue = [self.pacman_coord]
-                found_coords = set([])
-
-                while neighbors_queue:
-                    c = neighbors_queue.pop()
-
-                    for adj_c in [adj_c for adj_c in self.get_adj_coords(c) if not adj_c in wall_coords]:
-                        if not adj_c in found_coords:
-                            found_coords.add(adj_c)
-                            neighbors_queue.append(adj_c)
-
-                return found_coords == coords_to_find
+                # Determine if a path exists
+                return fast_pathfinder.find_path(self.pacman_coord, coords_to_find, self.get_adj_coords, wall_coords)
 
 
             if self.can_move_to(coord) and all_cells_reachable(self.wall_coords.union(set([coord]))):
