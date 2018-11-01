@@ -255,25 +255,22 @@ class GPacWorld:
 
         world = [[GPacChars.EMPTY for _ in range(self.width)] for _ in range(self.height)]
         
-        world[self.pacman_coord.x][self.pacman_coord.y] = GPacChars.PACMAN
-        
-        for c in self.ghost_coords:
-            world[c.x][c.y] = GPacChars.GHOST
-
-        for c in self.wall_coords:
-            world[c.x][c.y] = GPacChars.WALL
-
         for c in self.pill_coords:
             world[c.x][c.y] = GPacChars.PILL
 
         for c in self.fruit_coord:
             world[c.x][c.y] = GPacChars.FRUIT
 
-        # Reverse the world matrix for correct printing 
-        world = world[::-1]
+        for c in self.ghost_coords:
+            world[c.x][c.y] = GPacChars.GHOST
+
+        for c in self.wall_coords:
+            world[c.x][c.y] = GPacChars.WALL
+
+        world[self.pacman_coord.x][self.pacman_coord.y] = GPacChars.PACMAN
 
         for row in range(self.width):
-            for col in range(self.height):
+            for col in range(self.height - 1, -1, -1):
                 print(world[row][col].value, end=' ')
 
             print('\n')
