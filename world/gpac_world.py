@@ -7,7 +7,7 @@ import world.coordinate as coord_class
 import pyximport
 pyximport.install()
 
-import world.find_path as fast_pathfinder
+import world.generate_walls as fast_wall_generator
 
 
 class GPacWorld:
@@ -66,40 +66,11 @@ class GPacWorld:
         """Randomly generates a GPac world (in place) by placing walls and pills
         with densities found in self.config.
         """
-
-        def add_wall(coord):
-            """Attempts to add a wall to the world at coord.
-
-            A wall placement is unsuccessful if it blocks a portion of the world
-            from being reachable from any arbitrary coordinate in the world.
-
-            Reachability is guaranteed by finding a path from pacman's beginning cell 
-            to every cell in the world.
-
-            Returns True if successful, False otherwise.
-            """
-
-            def all_cells_reachable(wall_coords):
-                """Returns True if there is a path from pacman's starting cell
-                to every other non-wall cell. Returns False otherwise.
-                """
-                # Construct a set of coordinates to find
-                coords_to_find = self.all_coords.difference(wall_coords)
-
-                # Determine if a path exists
-                return fast_pathfinder.find_path(self.pacman_coord, coords_to_find, self.get_adj_coords, wall_coords)
-
-
-            if self.can_move_to(coord) and all_cells_reachable(self.wall_coords.union(set([coord]))):
-                self.wall_coords.add(coord)
-                return True
-
-            return False
-                
         # Add walls to the world
-        for c in self.all_coords.difference(set([self.pacman_coord])).difference(set([self.ghost_coords[0]])):
-            if random.random() < self.wall_density:
-                add_wall(c)
+        walls = fast_wall_generator.get_walls(self.all_coords, self.pacman_coord, self.ghost_coords, self.wall_coords, self.wall_density, self.get_adj_coords, self.can_move_to)
+
+        for wall in walls:
+            self.wall_coords.add(wall)
 
         # Add pills to the world
         for c in self.all_coords.difference(set([self.pacman_coord])).difference(self.wall_coords):
