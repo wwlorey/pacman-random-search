@@ -7,7 +7,7 @@ import world.gpac_world as gpac_world_class
 
 
 class GPDriver:
-    def __init__(self, config):
+    def __init__(self, config, initial_instance=False):
         """Initializes the GPDriver class.
         
         Where config is a Config object. 
@@ -23,7 +23,7 @@ class GPDriver:
 
         self.global_best_score = -1
 
-        self.init_game()
+        self.init_game(initial_instance)
 
 
     def init_run_variables(self):
@@ -35,9 +35,9 @@ class GPDriver:
         self.local_best_score = -1
 
 
-    def init_game(self):
+    def init_game(self, initial_instance=False):
         """(Re)initializes the GPacWorld class member variable."""
-        self.gpac_world = gpac_world_class.GPacWorld(self.config)
+        self.gpac_world = gpac_world_class.GPacWorld(self.config, initial_instance)
 
 
     def move_units(self):
@@ -78,13 +78,6 @@ class GPDriver:
             self.gpac_world.ghost_coords, self.gpac_world.fruit_coord, 
             self.gpac_world.time_remaining, self.gpac_world.score)
 
-        # Determine if a new local best score (fitness) has been found
-        if self.gpac_world.score > self.local_best_score:
-            self.local_best_score = self.gpac_world.score
-
-            # Write log file row
-            self.log.write_run_data(self.eval_count, self.local_best_score)
-    
 
     def decide_termination(self):
         """Returns False if the program will terminate, True otherwise.
@@ -113,9 +106,18 @@ class GPDriver:
         return True
 
 
-    def check_update_world_file(self):
-        """Writes a transcript of this run to the world file iff it had the 
+    def check_update_log_world_files(self):
+        """Writes a new log file entry iff a new local best score is found and writes
+        transcript of this run to the world file iff it had the 
         global best score."""
+        # Determine if a new local best score (fitness) has been found
+        if self.gpac_world.score > self.local_best_score:
+            self.local_best_score = self.gpac_world.score
+
+            # Write log file row
+            self.log.write_run_data(self.eval_count, self.local_best_score)
+
+        # Determine if a new global best score has been found
         if self.gpac_world.score > self.global_best_score:
             self.global_best_score = self.gpac_world.score
 

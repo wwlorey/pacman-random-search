@@ -23,7 +23,7 @@ POSSIBLE_GHOST_MOVES = [Direction.UP, Direction.DOWN, Direction.LEFT,
 
 
 class GPacWorld:
-    def __init__(self, config):
+    def __init__(self, config, initial_instance=False):
         """Initializes the GPacWorld class.
         
         Where config is a Config object for the GPac problem.
@@ -33,8 +33,8 @@ class GPacWorld:
         # Load configuration file settings
         self.width = int(self.config.settings['width'])
         self.height = int(self.config.settings['height'])
-        self.pill_density = float(self.config.settings['pill density'])
-        self.wall_density = float(self.config.settings['wall density'])
+        self.pill_density = float(self.config.settings['pill density']) / 100
+        self.wall_density = float(self.config.settings['wall density']) / 100
         self.num_ghosts = int(self.config.settings['num ghosts'])
         self.fruit_spawn_prob = float(self.config.settings['fruit spawn prob'])
         self.fruit_score = int(self.config.settings['fruit score'])
@@ -62,7 +62,10 @@ class GPacWorld:
                 self.all_coords.add(coord_class.Coordinate(x, y))
 
         # Place walls and pills in the world
-        self.generate_world()
+        # Only do this if the world is not being created for the first time
+        # Subsequent runs of the GP will ensure random board generation
+        if not initial_instance:
+            self.generate_world()
 
         # Create & write to world file
         self.world_file = world_file_class.WorldFile(self.config)
@@ -92,37 +95,21 @@ class GPacWorld:
                 to every other non-wall cell. Returns False otherwise.
                 """
                 
-                def find_path_recursive(coord):
-                    """Recursively attempts to 'travel' to all non-wall coordinates 
-                    (denoted by wall_coords) and returns True if possible, 
-                    False otherwise.
-                    """
-                    coords_to_find.remove(coord)
-
-                    if not len(coords_to_find):
-                        # All coordinates have been reached
-                        return True 
-
-                    # There are still coordinates to reach
-                    # Explore all adjacent coordinates that have not already been found
-                    for c in [adj_coord for adj_coord in self.get_adj_coords(coord) if not adj_coord in wall_coords]:
-                        if c in coords_to_find:
-                            if find_path_recursive(c):
-                                return True
-
-                    return False
-
-
                 # Construct a set of coordinates to find
-                coords_to_find = set([])
+                coords_to_find = self.all_coords.difference(wall_coords)
 
-                for c in self.all_coords:
-                    if not c in wall_coords:
-                        coords_to_find.add(c)
+                neighbors_queue = [self.pacman_coord]
+                found_coords = set([])
 
-                starting_coord = coord_class.Coordinate(0, self.height - 1)
+                while neighbors_queue:
+                    c = neighbors_queue.pop()
 
-                return find_path_recursive(starting_coord)
+                    for adj_c in [adj_c for adj_c in self.get_adj_coords(c) if not adj_c in wall_coords]:
+                        if not adj_c in found_coords:
+                            found_coords.add(adj_c)
+                            neighbors_queue.append(adj_c)
+
+                return found_coords == coords_to_find
 
 
             if self.can_move_to(coord) and all_cells_reachable(self.wall_coords.union(set([coord]))):
@@ -131,19 +118,10 @@ class GPacWorld:
 
             return False
                 
-
-        # Select coordinates to be walls
-        wall_coords_to_add = []
-        
+        # Add walls to the world
         for c in self.all_coords.difference(set([self.pacman_coord])).difference(set([self.ghost_coords[0]])):
             if random.random() < self.wall_density:
-                wall_coords_to_add.append(coord_class.Coordinate(c.x, c.y))
-
-        # Add walls to the world
-        # Note that adding walls after finding all wall candidates avoids issues with
-        # pathfinding checks and iterating through self.all_coords
-        for c in wall_coords_to_add:
-            add_wall(c)
+                add_wall(c)
 
         # Add pills to the world
         for c in self.all_coords.difference(set([self.pacman_coord])).difference(self.wall_coords):
