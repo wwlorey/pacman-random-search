@@ -16,29 +16,20 @@ if __name__ == '__main__':
 
 
     # Initialize the GP driver and its run variables
-    gp_driver = gp_driver_class.GPDriver(config, initial_instance=True)
+    gp_driver = gp_driver_class.GPDriver(config)
 
 
     # Run the GP
     while gp_driver.run_count <= int(config.settings['num experiment runs']):
-
-        gp_driver.init_run_variables()
-
-        gp_driver.log.write_run_header(gp_driver.run_count)
+        gp_driver.begin_run()
 
         while gp_driver.decide_termination():
-
-            gp_driver.init_game()
+            gp_driver.begin_eval()
 
             while gp_driver.check_game_over():
-                # Execute a turn
-                gp_driver.move_units()
+                gp_driver.execute_turn()
 
-                gp_driver.update_world_state()
+            gp_driver.end_eval()
 
-            gp_driver.check_update_log_world_files()
-
-            gp_driver.increment_eval_count()
-
-        gp_driver.increment_run_count()
+        gp_driver.end_run()
 

@@ -7,37 +7,70 @@ import world.gpac_world as gpac_world_class
 
 
 class GPDriver:
-    def __init__(self, config, initial_instance=False):
+    def __init__(self, config):
         """Initializes the GPDriver class.
         
-        Where config is a Config object. 
+        Where config is a Config object.
         """
         self.config = config
 
         self.seed = seed_class.Seed(self.config)
 
         self.run_count = 1
-        self.init_run_variables()
+        self.eval_count = 1
+        self.local_best_score = -1
 
         self.log = log_class.Log(self.config, self.seed, overwrite=True)
 
         self.global_best_score = -1
 
-        self.init_game(initial_instance)
+        self.gpac_world = gpac_world_class.GPacWorld(self.config, initial_instance=True)
 
 
-    def init_run_variables(self):
-        """Initializes run specific variables.
+    def execute_turn(self):
+        """Executes one game turn.
 
-        This function should be called before each run.
+        First, all units are moved. Second, the world state is updated.
+        """
+        self.move_units()
+        self.update_world_state()
+
+
+    def begin_run(self):
+        """Initializes run variables and writes a run header
+        to the log file. 
+
+        This should be called before each run.
         """
         self.eval_count = 1
         self.local_best_score = -1
+        self.log.write_run_header(self.run_count)
 
 
-    def init_game(self, initial_instance=False):
-        """(Re)initializes the GPacWorld class member variable."""
-        self.gpac_world = gpac_world_class.GPacWorld(self.config, initial_instance)
+    def end_run(self):
+        """Increments the run count by one.
+        
+        This should be called after each run.
+        """
+        self.run_count += 1
+
+
+    def begin_eval(self):
+        """(Re)initializes the GPacWorld class member variable.
+        
+        This should be called prior to each evaluation.
+        """
+        self.gpac_world = gpac_world_class.GPacWorld(self.config)
+
+
+    def end_eval(self):
+        """Conditionally updates the log and world files and increments 
+        the evaluation count.
+
+        This should be called after each evaluation.
+        """
+        self.check_update_log_world_files()
+        self.eval_count += 1
 
 
     def move_units(self):
@@ -123,14 +156,4 @@ class GPDriver:
 
             # Write to world file
             self.gpac_world.world_file.write_to_file()
-
-
-    def increment_run_count(self):
-        """Increments the run count by one."""
-        self.run_count += 1
-
-
-    def increment_eval_count(self):
-        """Increments the evaluation count by one."""
-        self.eval_count += 1
 

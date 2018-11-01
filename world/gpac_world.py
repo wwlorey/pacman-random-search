@@ -26,7 +26,8 @@ class GPacWorld:
     def __init__(self, config, initial_instance=False):
         """Initializes the GPacWorld class.
         
-        Where config is a Config object for the GPac problem.
+        Where config is a Config object for the GPac problem and initial_instance
+        determines if a random world should be generated yet.
         """
         self.config = config
 
@@ -38,7 +39,7 @@ class GPacWorld:
         self.num_ghosts = int(self.config.settings['num ghosts'])
         self.fruit_spawn_prob = float(self.config.settings['fruit spawn prob'])
         self.fruit_score = int(self.config.settings['fruit score'])
-        self.time_multiplier = float(self.config.settings['time multiplier'])
+        self.time_multiplier = int(self.config.settings['time multiplier'])
 
         # Create initial world attributes
         self.pacman_coord = coord_class.Coordinate(0, self.height - 1)
@@ -127,6 +128,12 @@ class GPacWorld:
         for c in self.all_coords.difference(set([self.pacman_coord])).difference(self.wall_coords):
             if random.random() < self.pill_density:
                 self.pill_coords.add(c)
+
+        # Ensure at least one pill was placed
+        if not len(self.pill_coords):
+            for c in self.all_coords.difference(set([self.pacman_coord])).difference(self.wall_coords):
+                self.pill_coords.add(c)
+                break
 
 
     def move_pacman(self, direction=Direction.RAND):
@@ -262,10 +269,8 @@ class GPacWorld:
         for c in self.fruit_coord:
             world[c.x][c.y] = GPacChars.FRUIT
 
-        # Flip each row in the world matrix for correct printing 
-        # TODO: re-evaluate this
-        for row_index in range(len(world)):
-            world[row_index] = world[row_index][::-1]
+        # Reverse the world matrix for correct printing 
+        world = world[::-1]
 
         for row in range(self.width):
             for col in range(self.height):
