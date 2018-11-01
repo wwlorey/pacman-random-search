@@ -83,6 +83,7 @@ class GPDriver:
         """Updates the state of the game *before* all characters have moved."""
         self.game_state.update(self.gpac_world.pacman_coord, self.gpac_world.ghost_coords, self.gpac_world.pill_coords)        
 
+
     def move_units(self):
         """Moves all units in self.gpac_world based on the unit controller moves.
         

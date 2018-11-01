@@ -3,6 +3,7 @@ class GameState:
         """Initializes the GameState class."""
         self.update(pacman_coord, ghost_coords, pill_coords)
 
+
     def update(self, pacman_coord, ghost_coords, pill_coords):
         """Updates the GameState class."""
         self.pacman_coord = pacman_coord
