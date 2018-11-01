@@ -1,25 +1,8 @@
-from enum import Enum
+import controllers.direction as d
 import copy
 import gp.world_file as world_file_class
 import random
 import world.coordinate as coord_class
-
-
-class Direction(Enum):
-    NONE  = 0  # Applicable to pacman only
-    UP    = 1
-    DOWN  = 2
-    LEFT  = 3
-    RIGHT = 4
-    RAND  = 5  # A random direction should be chosen
-
-
-# Define movement possibilities using Direction class
-POSSIBLE_PACMAN_MOVES = [Direction.NONE, Direction.UP, Direction.DOWN,
-    Direction.LEFT, Direction.RIGHT]
-
-POSSIBLE_GHOST_MOVES = [Direction.UP, Direction.DOWN, Direction.LEFT,
-    Direction.RIGHT]
 
 
 class GPacWorld:
@@ -136,32 +119,28 @@ class GPacWorld:
                 break
 
 
-    def move_pacman(self, direction=Direction.RAND):
+    def move_pacman(self, direction):
         """Attempts to move pacman in the given direction.
 
         Returns True if the move is successful, False otherwise.
         """
-        if direction == Direction.RAND:
-            # Choose a random direction
-            direction = random.choice(POSSIBLE_PACMAN_MOVES)
-
-        if direction == Direction.NONE:
+        if direction == d.Direction.NONE:
             # No action needed
             return True
 
         new_coord = copy.deepcopy(self.pacman_coord)
         
         # Adjust new_coord depending on pacman's desired direction
-        if direction == Direction.UP:
+        if direction == d.Direction.UP:
             new_coord.y += 1
 
-        elif direction == Direction.DOWN:
+        elif direction == d.Direction.DOWN:
             new_coord.y -= 1
 
-        elif direction == Direction.LEFT:
+        elif direction == d.Direction.LEFT:
             new_coord.x -= 1
 
-        elif direction == Direction.RIGHT:
+        elif direction == d.Direction.RIGHT:
             new_coord.x += 1
         
         if self.can_move_to(new_coord):
@@ -172,7 +151,7 @@ class GPacWorld:
         return False
 
 
-    def move_ghost(self, ghost_id, direction=Direction.RAND):
+    def move_ghost(self, ghost_id, direction):
         """Attempts to move ghost with ghost_id (index for self.ghost_coords) 
         in the given direction.
 
@@ -182,23 +161,19 @@ class GPacWorld:
             # This ghost does not exist
             return False
 
-        if direction == Direction.RAND:
-            # Choose a random direction
-            direction = random.choice(POSSIBLE_GHOST_MOVES)
-
         new_coord = copy.deepcopy(self.ghost_coords[ghost_id])
         
         # Adjust new_coord depending on pacman's desired direction
-        if direction == Direction.UP:
+        if direction == d.Direction.UP:
             new_coord.y += 1
 
-        elif direction == Direction.DOWN:
+        elif direction == d.Direction.DOWN:
             new_coord.y -= 1
 
-        elif direction == Direction.LEFT:
+        elif direction == d.Direction.LEFT:
             new_coord.x -= 1
 
-        elif direction == Direction.RIGHT:
+        elif direction == d.Direction.RIGHT:
             new_coord.x += 1
         
         if self.can_move_to(new_coord):

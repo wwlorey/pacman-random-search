@@ -1,6 +1,7 @@
-import copy
+import controllers.game_state as game_state_class
+import controllers.ghosts_controller as ghosts_cont_class
+import controllers.pacman_controller as pacman_cont_class
 import gp.log as log_class
-import math
 import random
 import util.seed as seed_class
 import world.gpac_world as gpac_world_class
@@ -26,14 +27,19 @@ class GPDriver:
 
         self.gpac_world = gpac_world_class.GPacWorld(self.config, initial_instance=True)
 
+        self.pacman_cont = pacman_cont_class.PacmanController()
+        self.ghosts_cont = ghosts_cont_class.GhostsController()
+
+        self.game_state = game_state_class.GameState(self.gpac_world.pacman_coord, self.gpac_world.ghost_coords, self.gpac_world.pill_coords)
+
 
     def execute_turn(self):
         """Executes one game turn.
 
-        First, all units are moved. Second, the world state is updated.
+        First, all units are moved. Second, the game state is updated.
         """
         self.move_units()
-        self.update_world_state()
+        self.update_game_state()
 
 
     def begin_run(self):
@@ -73,23 +79,27 @@ class GPDriver:
         self.eval_count += 1
 
 
-    def move_units(self):
-        """Moves all units in self.gpac_world in a random direction.
-        
-        This function implements the random controllers for each unit.
+    def update_game_state(self):
+        """Updates the state of the game *before* all characters have moved."""
+        self.game_state.update(self.gpac_world.pacman_coord, self.gpac_world.ghost_coords, self.gpac_world.pill_coords)        
 
-        Before units are moved, a fruit probabilistically spawns.
+    def move_units(self):
+        """Moves all units in self.gpac_world based on the unit controller moves.
+        
+        Before units are moved, a fruit probabilistically spawns and the game state
+        is updated.
+
+        After units are moved, game variables are updated.
         """
         self.gpac_world.randomly_spawn_fruit()
 
-        self.gpac_world.move_pacman()
+        self.update_game_state()
+
+        self.gpac_world.move_pacman(self.pacman_cont.get_move(self.game_state))
 
         for ghost_id in range(len(self.gpac_world.ghost_coords)):
-            self.gpac_world.move_ghost(ghost_id)
+            self.gpac_world.move_ghost(ghost_id, self.ghosts_cont.get_move(self.game_state))
 
-
-    def update_world_state(self):
-        """Updates the state of the world *after* all characters have moved."""
         # Update time remaining
         self.gpac_world.time_remaining -= 1
 
