@@ -1,0 +1,79 @@
+###################################
+# GP Parameters
+###################################
+num experiment runs = 3
+num fitness evals = 2000
+
+###################################
+# World Generation Parameters
+###################################
+width = 40
+height = 50
+pill density = 70
+wall density = 35
+num ghosts = 3
+
+num wall carvers = 5
+max wall carver travel distance = 10
+min wall carver travel distance = 3
+
+use external seed = False
+default seed = 123456789
+
+###################################
+# Score 
+###################################
+fruit spawn prob = 0.05
+fruit score = 10
+
+###################################
+# Timing
+###################################
+time multiplier = 2
+
+###################################
+# Output Files
+###################################
+log file path = output/med_large_log.txt
+world file path = output/highest_score_game_sequence_all_time_step_world_file_med_large.txt
+
+###################################
+# Seed Value
+###################################
+seed = 1541176365.6652634
+
+Result Log
+
+Run 1
+1	25
+3	34
+11	36
+23	42
+31	45
+50	49
+62	58
+513	69
+1904	82
+
+Run 2
+1	15
+2	17
+3	27
+5	28
+9	35
+12	38
+25	49
+45	50
+80	52
+99	73
+
+Run 3
+1	19
+2	40
+5	43
+17	48
+29	50
+63	54
+127	62
+535	66
+1898	71
