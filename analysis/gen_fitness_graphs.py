@@ -53,13 +53,11 @@ for file_index in range(len(log_file_paths)):
         fits += [fits[-1]]
 
         # Plot the results
-        plt.plot(evals, fits, '-bo', linewidth = 2.0)
+        plt.step(evals, fits, '-b')
 
         # Include necessary labels
         plt.xlabel('Evaluations')
         plt.ylabel('Fitness')
-
-        # plt.annotate('Maximum fitness (score): ' + str(fits[-2]) + '\nEvaluation number: ' + str(evals[-2]), xy = (evals[-2], fits[-2]), xytext=(1, -60), ha='right', textcoords='offset points', arrowprops=dict(arrowstyle = 'simple', shrinkA = 0))
 
         # Save and close the plot
         plt.savefig(log_file_paths[file_index][:log_file_paths[file_index].find('log')] + 'graph.png')
