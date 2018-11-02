@@ -17,6 +17,10 @@ pill density = {pill density}\n\
 wall density = {wall density}\n\
 num ghosts = 3\n\
 \n\
+num wall carvers = {num wall carvers}\n\
+max wall carver travel distance = 10\n\
+min wall carver travel distance = 3\n\
+\n\
 use external seed = False\n\
 default seed = 123456789\n\
 \n\
@@ -35,17 +39,19 @@ time multiplier = {time multiplier}\n\
 # Output Files\n\
 ###################################\n\
 log file path = output/{experiment name}_log.txt\n\
-world file path = output/highest_score_game_sequence_all_time_step_world_file_{experiment name}.txt'
+world file path = output/highest_score_game_sequence_all_time_step_world_file_{experiment name}.txt\n'
 
 config_data = \
 [
-    (10, 10, 50, 25, 0.05, 10, 2, 'small'), 
-    (30, 20, 20, 30, 0.05, 10, 2, 'med_small'), 
-    (40, 50, 70, 35, 0.05, 10, 2, 'med_large'), 
-    (80, 80, 30, 30, 0.05, 10, 2, 'large')
+    (10, 10, 50, 25, 0.05, 10, 2, 'small', 4), 
+    (30, 20, 20, 30, 0.05, 10, 2, 'med_small', 4), 
+    (40, 50, 70, 35, 0.05, 10, 2, 'med_large', 5), 
+    (80, 80, 30, 30, 0.05, 10, 2, 'large', 5)
 ]
 
-config_data_key = ['width', 'height', 'pill density', 'wall density', 'fruit spawn prob', 'fruit score', 'time multiplier', 'experiment name']
+FILE_NAME_INDEX = 7
+
+config_data_key = ['width', 'height', 'pill density', 'wall density', 'fruit spawn prob', 'fruit score', 'time multiplier', 'experiment name', 'num wall carvers']
 
 
 # Populate new config files
@@ -63,7 +69,7 @@ for tup in config_data:
             insertion_index = config_str.find(search_str)
 
     # Create config file
-    file_name = '../' + tup[-1] + '.cfg'
+    file_name = tup[FILE_NAME_INDEX] + '.cfg'
 
     f = open(file_name, 'w')
 
