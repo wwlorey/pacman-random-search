@@ -5,7 +5,9 @@ import matplotlib.pyplot as plt
 log_file_paths = \
     [
         '../output/small_log.txt',
-        '../output/med_small_log.txt'
+        '../output/med_small_log.txt',
+        '../output/med_large_log.txt',
+        '../output/large_log.txt'
     ]
 
 NUM_EVALS_PERFORMED = 2000
