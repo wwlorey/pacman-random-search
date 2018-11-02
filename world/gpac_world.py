@@ -1,9 +1,10 @@
-from enum import Enum
 import controllers.direction as d
 import copy
 import gp.world_file as world_file_class
 import random
 import world.coordinate as coord_class
+import world.gpac_chars as chars
+import world.wall_carver as wall_carver_class
 
 
 class GPacWorld:
@@ -67,6 +68,7 @@ class GPacWorld:
             """Places (carves out) walls in the world such that every non-wall cell is 
             accessible from every other non-wall cell.
             """
+
             def assign_unit_starting_coords(wall_carver_list):
                 """Assigns the first two WallCarvers in wall_carver_list to have 
                 the unit (pacman & ghosts) starting coords, ensuring these
@@ -75,98 +77,25 @@ class GPacWorld:
                 wall_carver_list[0].coord = self.pacman_coord
                 wall_carver_list[1].coord = self.ghost_coords[0]
 
-            
-            class WallCarver:
-                def __init__(self, x, y, config):
-                    """Initializes the WallCarver class."""
-                    self.config = config
-                    self.max_travel_dist = int(self.config.settings['max wall carver travel distance'])
-                    self.min_travel_dist = int(self.config.settings['min wall carver travel distance'])
-                    self.max_x = int(self.config.settings['width'])
-                    self.max_y = int(self.config.settings['height'])
-
-                    self.POSSIBLE_MOVES = [d.Direction.UP, d.Direction.DOWN, d.Direction.LEFT, d.Direction.RIGHT]
-
-                    self.coord = coord_class.Coordinate(x, y)
-
-                    self.get_travel_distance()
-                    self.get_direction()
-
-                    self.seen_coords = set([])
-
-                    self.marked_for_death = False
-
-
-                def __eq__(self, other):
-                    return self.travel_distance == other.travel_distance and self.coord == other.coord and self.direction == other.direction
-
-
-                def get_travel_distance(self):
-                    """Randomly generates a new travel distance."""
-                    self.travel_distance = random.randint(self.min_travel_dist, self.max_travel_dist)
-
-
-                def get_direction(self):
-                    """Randomly generates a new travel direction."""
-                    self.direction = random.choices(self.POSSIBLE_MOVES)[0]
-
-
-                def move(self):
-                    """Moves the WallCarver, generating new travel parameters if the travel
-                    distance is reached.
-                    """
-                    if self.travel_distance <= 0:
-                        self.get_travel_distance()
-                        self.get_direction()
-
-                    new_coord = copy.deepcopy(self.coord)
-
-                    if self.direction == d.Direction.UP:
-                        new_coord.y += 1
-
-                    elif self.direction == d.Direction.DOWN:
-                        new_coord.y -= 1
-
-                    elif self.direction == d.Direction.LEFT:
-                        new_coord.x -= 1
-
-                    elif self.direction == d.Direction.RIGHT:
-                        new_coord.x += 1
-                    
-                    if new_coord.x >= 0 and new_coord.y >= 0 and new_coord.x < self.max_x and new_coord.y < self.max_y:
-                        self.coord = copy.deepcopy(new_coord)
-
-                    self.travel_distance -= 1
-
-
-                def coord_already_carved(self, wall_carver_list):
-                    """Returns True if this WallCarver's coord has already been carved (which 
-                    is extrapolated from wall_carver_list). Returns False otherwise.
-                    """
-                    # Remove this WallCarver from wall_carver_list
-                    wall_carver_list = [wall_carver for wall_carver in wall_carver_list if wall_carver != self]
-                    
-                    for other_wall_carver in wall_carver_list:
-                        if self.coord in other_wall_carver.seen_coords:
-                            return True
-
-                    return False
-
-
-                def mark_for_death(self):
-                    """Marks a WallCarver for death."""
-                    self.marked_for_death = True
-
 
             # Create WallCarver population
             # Note: num wall carvers should be greater than or equal to two
-            wall_carvers = [WallCarver(random.randint(0, self.width), random.randint(0, self.height), self.config) for _ in range(int(self.config.settings['num wall carvers']))]
+            wall_carvers = [wall_carver_class.WallCarver(random.randint(0, self.width), random.randint(0, self.height), self.config) for _ in range(int(self.config.settings['num wall carvers']))]
             assign_unit_starting_coords(wall_carvers)
 
             # Get walls to carve
             walls_to_carve = copy.deepcopy(self.all_coords)
 
-            while len(wall_carvers) > 1:
+            # Calculate wall density
+            num_coords = len(walls_to_carve)
+            num_walls = num_coords
+            wall_density = num_walls / num_coords
+
+            while wall_density > self.wall_density:
+                if len(wall_carvers) <= 1:
+                    # Re-spawn WallCarvers
+                    wall_carvers = [wall_carver_class.WallCarver(random.randint(0, self.width), random.randint(0, self.height), self.config) for _ in range(int(self.config.settings['num wall carvers']))]
+
                 for wall_carver in wall_carvers:
                     if wall_carver.coord_already_carved(wall_carvers):
                         # This coord has already been seen by another WallCarver
@@ -176,21 +105,20 @@ class GPacWorld:
                         # This is a new coord. Remove the wall
                         walls_to_carve.remove(wall_carver.coord)
                         wall_carver.seen_coords.add(wall_carver.coord)
+                        num_walls -= 1
 
                     wall_carver.move()
-                        
+
                 # Kill WallCarvers marked for death
                 wall_carvers = [wall_carver for wall_carver in wall_carvers if not wall_carver.marked_for_death]
 
+                wall_density = num_walls / num_coords
+
             self.wall_coords = walls_to_carve
 
-                
+
         # Add walls to the world
         add_walls()
-
-        # for c in self.all_coords.difference(set([self.pacman_coord])).difference(set([self.ghost_coords[0]])):
-        #   if random.random() < self.wall_density:
-        #       add_wall(c)
 
         # Add pills to the world
         for c in self.all_coords.difference(set([self.pacman_coord])).difference(self.wall_coords):
@@ -307,32 +235,25 @@ class GPacWorld:
         to pass in alternate wall coordinates.
         """
         
-        class GPacChars(Enum):
-            EMPTY  = '_'
-            PACMAN = 'P'
-            GHOST  = 'G'
-            WALL   = 'X'
-            PILL   = 'p'
-            FRUIT  = 'F'
 
         if not wall_coords:
             wall_coords = self.wall_coords
 
-        world = [[GPacChars.EMPTY for _ in range(self.width)] for _ in range(self.height)]
+        world = [[chars.GPacChars.EMPTY for _ in range(self.width)] for _ in range(self.height)]
         
         for c in self.pill_coords:
-            world[c.x][c.y] = GPacChars.PILL
+            world[c.x][c.y] = chars.GPacChars.PILL
 
         for c in self.fruit_coord:
-            world[c.x][c.y] = GPacChars.FRUIT
+            world[c.x][c.y] = chars.GPacChars.FRUIT
 
         for c in self.ghost_coords:
-            world[c.x][c.y] = GPacChars.GHOST
+            world[c.x][c.y] = chars.GPacChars.GHOST
 
         for c in wall_coords:
-            world[c.x][c.y] = GPacChars.WALL
+            world[c.x][c.y] = chars.GPacChars.WALL
 
-        world[self.pacman_coord.x][self.pacman_coord.y] = GPacChars.PACMAN
+        world[self.pacman_coord.x][self.pacman_coord.y] = chars.GPacChars.PACMAN
 
         for row in range(self.width):
             for col in range(self.height - 1, -1, -1):
