@@ -1,3 +1,7 @@
+#### CS 5401 Evolutionary Computing | Controlling pacman & the ghosts randomly
+
+#### Provided README:
+
 #################################
 #	Coding Standards	#
 #################################
